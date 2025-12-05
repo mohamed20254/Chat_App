@@ -1,3 +1,4 @@
+import 'package:chat_app/config/routing/app_routing.dart';
 import 'package:chat_app/config/theme/app_theme.dart';
 import 'package:chat_app/presentation/screen/login_screen.dart';
 import 'package:flutter/material.dart';
@@ -16,6 +17,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'chat App',
       theme: AppTheme.lightTheme,
+      onGenerateRoute: AppRouting.onGenerateRoute,
       home: const LoginScreen(),
     );
   }
