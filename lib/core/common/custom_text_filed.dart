@@ -10,7 +10,7 @@ class CustomTextFiled extends StatefulWidget {
     this.validator,
     this.focusNode,
     this.controller,
-    this.onSaved,
+    this.onFieldSubmitted,
   });
   final String labeltext;
   final FocusNode? focusNode;
@@ -19,7 +19,7 @@ class CustomTextFiled extends StatefulWidget {
   final TextInputType? keyboardType;
   final TextEditingController? controller;
   final IconData prefixIcon;
-  final void Function(String?)? onSaved;
+  final void Function(String?)? onFieldSubmitted;
   @override
   State<CustomTextFiled> createState() => _CustomTextFiledState();
 }
@@ -36,8 +36,7 @@ class _CustomTextFiledState extends State<CustomTextFiled> {
   Widget build(BuildContext context) {
     return TextFormField(
       controller: widget.controller,
-
-      onSaved: widget.onSaved,
+      onFieldSubmitted: widget.onFieldSubmitted,
 
       focusNode: widget.focusNode,
       validator: widget.validator,

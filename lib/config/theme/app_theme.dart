@@ -66,13 +66,34 @@ class AppTheme {
     // Text Themes
     textTheme: const TextTheme(
       titleLarge: TextStyle(
-        fontSize: 18,
+        fontSize: 28,
         fontWeight: FontWeight.w600,
         color: Colors.black,
       ),
-      bodyLarge: TextStyle(fontSize: 16, color: Colors.black87),
-      bodyMedium: TextStyle(fontSize: 14, color: Colors.black87),
-      labelMedium: TextStyle(fontSize: 12, color: Colors.grey),
+      titleMedium: TextStyle(
+        fontSize: 25,
+        fontWeight: FontWeight.w500,
+        color: Colors.black,
+      ),
+      titleSmall: TextStyle(
+        fontSize: 20,
+        fontWeight: FontWeight.w500,
+        color: Colors.black,
+      ),
+
+      bodyLarge: TextStyle(
+        fontSize: 18,
+        color: Colors.black87,
+        fontWeight: FontWeight.w400,
+      ),
+      bodyMedium: TextStyle(
+        fontSize: 16,
+        color: Colors.black87,
+        fontWeight: FontWeight.w400,
+      ),
+      labelLarge: TextStyle(fontSize: 13),
+      labelMedium: TextStyle(fontSize: 10),
+      labelSmall: TextStyle(fontSize: 8),
     ),
 
     // Button Theme
