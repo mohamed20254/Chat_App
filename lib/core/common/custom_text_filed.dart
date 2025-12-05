@@ -33,7 +33,7 @@ class _CustomTextFiledState extends State<CustomTextFiled> {
 
   bool isVisibility = false;
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return TextFormField(
       controller: widget.controller,
       onFieldSubmitted: widget.onFieldSubmitted,
@@ -48,12 +48,12 @@ class _CustomTextFiledState extends State<CustomTextFiled> {
         suffixIcon: widget.obscureText
             ? !isVisibility
                   ? IconButton(
-                      icon: Icon(Icons.visibility_off),
+                      icon: const Icon(Icons.visibility_off),
                       onPressed: onpressed,
                     )
                   : IconButton(
                       onPressed: onpressed,
-                      icon: Icon(Icons.visibility),
+                      icon: const Icon(Icons.visibility_outlined),
                     )
             : null,
         prefixIcon: Icon(widget.prefixIcon),

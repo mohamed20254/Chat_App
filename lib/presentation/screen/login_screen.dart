@@ -1,6 +1,8 @@
 import 'package:chat_app/config/routing/app_routing.dart';
 import 'package:chat_app/core/common/custom_button.dart';
 import 'package:chat_app/core/common/custom_text_filed.dart';
+import 'package:chat_app/core/helper/app_validation.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
@@ -12,10 +14,18 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  //==========formkey
+  final GlobalKey<FormState> _formlKey = GlobalKey<FormState>();
+
+  //============controler
   late TextEditingController email;
   late TextEditingController password;
+
+  //========================focusNode
   late FocusNode focusNodeemail;
   late FocusNode focusNodpass;
+
+  //====================initstate
   @override
   void initState() {
     email = TextEditingController();
@@ -24,6 +34,7 @@ class _LoginScreenState extends State<LoginScreen> {
     focusNodpass = FocusNode();
     super.initState();
   }
+  //===============dispose
 
   @override
   void dispose() {
@@ -40,6 +51,7 @@ class _LoginScreenState extends State<LoginScreen> {
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Form(
+          key: _formlKey,
           child: SingleChildScrollView(
             child: Column(
               crossAxisAlignment: .start,
@@ -58,27 +70,38 @@ class _LoginScreenState extends State<LoginScreen> {
                 const SizedBox(height: 16),
                 //email
                 CustomTextFiled(
+                  validator: AppValidators.validateEmail,
                   focusNode: focusNodeemail,
                   onFieldSubmitted: (_) {
                     FocusScope.of(context).requestFocus(focusNodpass);
                   },
                   controller: email,
                   labeltext: "E-mail",
-                  prefixIcon: Icons.email_outlined,
+                  prefixIcon: CupertinoIcons.mail,
                   keyboardType: TextInputType.emailAddress,
                 ),
                 //password
                 const SizedBox(height: 16),
                 CustomTextFiled(
+                  validator: AppValidators.validatePhone,
                   focusNode: focusNodpass,
                   controller: password,
                   labeltext: "Password",
-                  prefixIcon: Icons.lock_outline_rounded,
+                  prefixIcon: CupertinoIcons.lock,
                   obscureText: true,
                   keyboardType: TextInputType.text,
                 ),
                 const SizedBox(height: 20),
-                CustomButton(onPressed: () {}, text: "Login"),
+                CustomButton(
+                  onPressed: () {
+                    //?=========================================ontap login
+                    FocusScope.of(context).unfocus();
+                    if (_formlKey.currentState?.validate() ?? false) {
+                      //Navigator
+                    }
+                  },
+                  text: "Login",
+                ),
                 const SizedBox(height: 30),
                 Center(
                   child: Text.rich(

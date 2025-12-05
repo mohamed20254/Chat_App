@@ -1,5 +1,7 @@
 import 'package:chat_app/core/common/custom_button.dart';
 import 'package:chat_app/core/common/custom_text_filed.dart';
+import 'package:chat_app/core/helper/app_validation.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
@@ -11,18 +13,22 @@ class SignupScreen extends StatefulWidget {
 }
 
 class _SignupScreenState extends State<SignupScreen> {
+  final GlobalKey<FormState> _key = GlobalKey<FormState>();
+
+  //======================controler
   late TextEditingController emailC;
   late TextEditingController passwordC;
   late TextEditingController fullnameC;
   late TextEditingController phoneC;
   late TextEditingController usernameC;
-
+  //=============================focusNodes
   late FocusNode focusNodeMail;
   late FocusNode focusNodePass;
   late FocusNode focusNodePhone;
   late FocusNode focusNodeUsername;
   late FocusNode focusNodeFullname;
 
+  //==========================initState
   @override
   void initState() {
     emailC = TextEditingController();
@@ -40,6 +46,7 @@ class _SignupScreenState extends State<SignupScreen> {
     super.initState();
   }
 
+  //=================================dispose
   @override
   void dispose() {
     emailC.dispose();
@@ -62,6 +69,7 @@ class _SignupScreenState extends State<SignupScreen> {
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Form(
+            key: _key,
             child: SingleChildScrollView(
               child: Column(
                 crossAxisAlignment: .start,
@@ -94,71 +102,83 @@ class _SignupScreenState extends State<SignupScreen> {
                   const SizedBox(height: 16),
                   //=============================fullname
                   CustomTextFiled(
+                    validator: AppValidators.validateName,
                     focusNode: focusNodeFullname,
                     onFieldSubmitted: (_) {
                       FocusScope.of(context).requestFocus(focusNodeUsername);
                     },
                     controller: fullnameC,
                     labeltext: "full Name",
-                    prefixIcon: Icons.person_3_outlined,
+                    prefixIcon: CupertinoIcons.person,
                     keyboardType: TextInputType.name,
                   ),
                   const SizedBox(height: 16),
                   //======================== username
                   CustomTextFiled(
+                    validator: AppValidators.validateName,
                     focusNode: focusNodeUsername,
                     onFieldSubmitted: (_) {
                       FocusScope.of(context).requestFocus(focusNodePhone);
                     },
                     controller: usernameC,
                     labeltext: "User name",
-                    prefixIcon: Icons.person_outline_rounded,
+                    prefixIcon: CupertinoIcons.at,
                     keyboardType: TextInputType.name,
                   ),
                   const SizedBox(height: 16),
                   //============================ Phone
                   CustomTextFiled(
+                    validator: AppValidators.validatePhone,
                     focusNode: focusNodePhone,
                     onFieldSubmitted: (_) {
                       FocusScope.of(context).requestFocus(focusNodeMail);
                     },
                     controller: phoneC,
                     labeltext: "Phone",
-                    prefixIcon: Icons.phone,
+                    prefixIcon: CupertinoIcons.phone,
                     keyboardType: TextInputType.phone,
                   ),
                   const SizedBox(height: 16),
                   //email
                   CustomTextFiled(
+                    validator: AppValidators.validateEmail,
                     focusNode: focusNodeMail,
                     onFieldSubmitted: (_) {
                       FocusScope.of(context).requestFocus(focusNodePass);
                     },
                     controller: emailC,
                     labeltext: "E-mail",
-                    prefixIcon: Icons.email_outlined,
+                    prefixIcon: CupertinoIcons.mail,
                     keyboardType: TextInputType.emailAddress,
                   ),
                   const SizedBox(height: 16),
                   //password
                   const SizedBox(height: 16),
                   CustomTextFiled(
+                    validator: AppValidators.validatePassword,
                     focusNode: focusNodePass,
                     controller: passwordC,
                     labeltext: "Password",
-                    prefixIcon: Icons.lock_outline_rounded,
+                    prefixIcon: CupertinoIcons.lock,
                     obscureText: true,
                     keyboardType: TextInputType.text,
                   ),
                   const SizedBox(height: 20),
-                  CustomButton(onPressed: () {}, text: "sign Up"),
+                  CustomButton(
+                    onPressed: () {
+                      //?============================================= ontap create account
+                      FocusScope.of(context).unfocus();
+                      if (_key.currentState?.validate() ?? false) {}
+                    },
+                    text: "Create Account",
+                  ),
                   const SizedBox(height: 30),
                   Center(
                     child: Text.rich(
                       TextSpan(
                         children: [
                           TextSpan(
-                            text: "have an account ",
+                            text: " already have an account ",
                             style: Theme.of(context).textTheme.bodyMedium,
                           ),
                           TextSpan(

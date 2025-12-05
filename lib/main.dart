@@ -12,7 +12,7 @@ class MyApp extends StatelessWidget {
 
   // This widget is the root of your application.
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'chat App',
