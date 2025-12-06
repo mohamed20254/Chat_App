@@ -2,9 +2,11 @@ import 'package:chat_app/config/routing/app_routing.dart';
 import 'package:chat_app/core/common/custom_button.dart';
 import 'package:chat_app/core/common/custom_text_filed.dart';
 import 'package:chat_app/core/helper/app_validation.dart';
+import 'package:chat_app/logic/cubit/auth_cubit.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -83,7 +85,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 //password
                 const SizedBox(height: 16),
                 CustomTextFiled(
-                  validator: AppValidators.validatePhone,
+                  validator: AppValidators.validatePassword,
                   focusNode: focusNodpass,
                   controller: password,
                   labeltext: "Password",
@@ -92,15 +94,34 @@ class _LoginScreenState extends State<LoginScreen> {
                   keyboardType: TextInputType.text,
                 ),
                 const SizedBox(height: 20),
-                CustomButton(
-                  onPressed: () {
-                    //?=========================================ontap login
-                    FocusScope.of(context).unfocus();
-                    if (_formlKey.currentState?.validate() ?? false) {
-                      //Navigator
+                BlocConsumer<AuthCubit, AuthState>(
+                  listener: (final context, final state) {
+                    if (state is AuthFailure) {
+                      ScaffoldMessenger.of(
+                        context,
+                      ).showSnackBar(SnackBar(content: Text(state.messgae)));
                     }
                   },
-                  text: "Login",
+                  builder: (final context, final state) {
+                    return CustomButton(
+                      onPressed: () {
+                        //?=========================================ontap login
+
+                        FocusScope.of(context).unfocus();
+                        if (_formlKey.currentState?.validate() ?? false) {
+                          context.read<AuthCubit>().login(
+                            email: email.text,
+                            password: password.text,
+                          );
+                        }
+                      },
+
+                      text: state is AuthLoading ? null : "login",
+                      child: state is AuthLoading
+                          ? const CircularProgressIndicator(color: Colors.white)
+                          : null,
+                    );
+                  },
                 ),
                 const SizedBox(height: 30),
                 Center(

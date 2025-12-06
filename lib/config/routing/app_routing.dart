@@ -1,6 +1,9 @@
-import 'package:chat_app/presentation/screen/login_screen.dart';
-import 'package:chat_app/presentation/screen/signup_screen.dart';
+import 'package:chat_app/config/injection/injection.dart';
+import 'package:chat_app/logic/cubit/auth_cubit.dart';
+import 'package:chat_app/presentation/auth/screen/login_screen.dart';
+import 'package:chat_app/presentation/auth/screen/signup_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class AppRouting {
   //==========namerout
@@ -12,15 +15,24 @@ class AppRouting {
     switch (setting.name) {
       case initpage:
         return MaterialPageRoute(
-          builder: (final context) => const LoginScreen(),
+          builder: (final context) => BlocProvider(
+            create: (final context) => sl<AuthCubit>(),
+            child: const LoginScreen(),
+          ),
         );
       case login:
         return MaterialPageRoute(
-          builder: (final context) => const LoginScreen(),
+          builder: (final context) => BlocProvider(
+            create: (final context) => sl<AuthCubit>(),
+            child: const LoginScreen(),
+          ),
         );
       case signup:
         return MaterialPageRoute(
-          builder: (final context) => const SignupScreen(),
+          builder: (final context) => BlocProvider(
+            create: (final context) => sl<AuthCubit>(),
+            child: const SignupScreen(),
+          ),
         );
       default:
         return MaterialPageRoute(
