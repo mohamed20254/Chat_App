@@ -101,6 +101,13 @@ class _LoginScreenState extends State<LoginScreen> {
                         context,
                       ).showSnackBar(SnackBar(content: Text(state.messgae)));
                     }
+                    if (state is Authfinish) {
+                      Navigator.pushNamedAndRemoveUntil(
+                        context,
+                        AppRouting.home,
+                        (_) => false,
+                      );
+                    }
                   },
                   builder: (final context, final state) {
                     return CustomButton(

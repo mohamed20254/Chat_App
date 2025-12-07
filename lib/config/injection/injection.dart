@@ -1,4 +1,5 @@
 import 'package:chat_app/data/repo/auth_repo.dart';
+import 'package:chat_app/data/repo/contact_repo.dart';
 import 'package:chat_app/data/services/auth_remote.dart';
 import 'package:chat_app/logic/cubit/auth_cubit.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -24,6 +25,7 @@ Future<void> injectionApp() async {
   sl.registerLazySingleton<AuthRepo>(
     () => AuthRepoImpl(remote: sl<AuthRemote>()),
   );
+  sl.registerLazySingleton<ContactRepo>(() => ContactRepo());
 
   //cubit
   sl.registerFactory<AuthCubit>(() => AuthCubit(sl<AuthRepo>()));

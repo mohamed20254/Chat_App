@@ -1,5 +1,6 @@
 import 'dart:developer';
 import 'package:chat_app/config/injection/injection.dart';
+import 'package:chat_app/data/model/contact_model.dart';
 import 'package:chat_app/data/services/auth_remote.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
@@ -11,12 +12,12 @@ class ContactRepo {
     return await FlutterContacts.requestPermission();
   }
 
-  Future<List<Map<String, dynamic>>> getRegisteredContacts() async {
+  Future<ContactViewModel> getRegisteredContacts() async {
     try {
       final bool hasPermission = await requestContactsPermission();
       if (!hasPermission) {
-        print('Contacts permission denied');
-        return [];
+        log('Contacts permission denied');
+        return ContactViewModel(matchedContacts: [], phoneNumpers: []);
       }
       final List<Contact> contacs = await FlutterContacts.getContacts(
         withProperties: true,
@@ -28,14 +29,15 @@ class ContactRepo {
           .map(
             (final contact) => {
               "fullname": contact.displayName,
-              "phonenmper": contact.phones.first.number.replaceAll(
-                RegExp(r'[^\d+]'),
-                '',
-              ),
-              "phott": contact.photo,
+              "phonenmper": contact.phones.isNotEmpty
+                  ? contact.phones.first.number.replaceAll(
+                      RegExp(r'[^\d+]'),
+                      '',
+                    )
+                  : "",
+              "photo": contact.photo,
             },
           );
-
       final rejesterUsers = await sl<AuthRemote>().getAlluser();
 
       final matchedContacts = phoneNumpers
@@ -46,12 +48,12 @@ class ContactRepo {
               phoneNumper.substring(3);
             }
             return rejesterUsers.any(
-              (user) =>
+              (final user) =>
                   user.phoneNumber == phoneNumper && user.uid != currentUserId,
             );
           })
           .map((final contact) {
-            String phoneNumber = contact["phoneNumber"]
+            String phoneNumber = contact["phonenmper"]
                 .toString(); // Ensure it's a String
 
             if (phoneNumber.startsWith("+20")) {
@@ -62,17 +64,26 @@ class ContactRepo {
               (final user) => user.phoneNumber == phoneNumber,
             );
 
-            return {
-              'id': registeredUser.uid,
-              'name': contact['fullname'],
-              'phoneNumber': contact['phonenmper'],
-            };
+            return ContactModel.fromjson(contact, uid: registeredUser.uid);
           })
           .toList();
-      return matchedContacts;
+
+      return ContactViewModel(
+        matchedContacts: matchedContacts,
+        phoneNumpers: phoneNumpers
+            .map((e) => ContactModel.fromjson(e))
+            .toList(),
+      );
     } on Exception catch (e) {
       log('Error getting registered contacts: $e');
-      return [];
+      return ContactViewModel(matchedContacts: [], phoneNumpers: []);
     }
   }
+}
+
+class ContactViewModel {
+  final List<ContactModel> matchedContacts;
+  final List<ContactModel> phoneNumpers;
+
+  ContactViewModel({required this.matchedContacts, required this.phoneNumpers});
 }

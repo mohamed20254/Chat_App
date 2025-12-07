@@ -17,6 +17,8 @@ abstract class AuthRemote {
     required final String password,
   });
   Future<UserModel> getUser({required final String uid});
+
+  Future<List<UserModel>> getAlluser();
 }
 
 class AuthRemoteImpl implements AuthRemote {
@@ -79,5 +81,12 @@ class AuthRemoteImpl implements AuthRemote {
       throw MyFirebaseAuthException("user data not found");
     }
     return UserModel.fromFirestore(doc);
+  }
+
+  @override
+  Future<List<UserModel>> getAlluser() async {
+    final snaphots = await _firestore.collection(usercollction).get();
+    final docs = snaphots.docs;
+    return docs.map((e) => UserModel.fromFirestore(e)).toList();
   }
 }

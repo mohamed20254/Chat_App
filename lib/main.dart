@@ -1,7 +1,6 @@
 import 'package:chat_app/config/routing/app_routing.dart';
 import 'package:chat_app/config/theme/app_theme.dart';
 import 'package:chat_app/firebase_options.dart';
-import 'package:chat_app/presentation/auth/screen/login_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:chat_app/config/injection/injection.dart' as di;
