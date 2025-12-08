@@ -1,10 +1,13 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:chat_app/config/injection/injection.dart';
+import 'package:chat_app/core/error/failure.dart';
 import 'package:chat_app/data/model/chat_message_model.dart';
 import 'package:chat_app/data/model/chat_room_model.dart';
 import 'package:chat_app/data/services/auth_remote.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dartz/dartz.dart';
 
 abstract class ChatRepo {
   Future<ChatRoomModel> getOrcreateChatRoom({
@@ -19,12 +22,17 @@ abstract class ChatRepo {
     required final String receiverId,
     final MessageType type = MessageType.text,
   });
+
+  Stream<Either<Failure, List<ChatMessage>>> getMesages({
+    required final String chatRoomId,
+  });
 }
 
 final class ChatRepoImpl implements ChatRepo {
   CollectionReference get _collectionReference =>
       sl<FirebaseFirestore>().collection("chatRoom");
-
+  final messagesControler =
+      StreamController<Either<Failure, List<ChatMessage>>>();
   CollectionReference getChatRoomMessages(final String chatRoomId) {
     return _collectionReference.doc(chatRoomId).collection("messages");
   }
@@ -94,5 +102,34 @@ final class ChatRepoImpl implements ChatRepo {
       "lastMessageTime": message.timestamp,
     });
     await batch.commit();
+  }
+
+  @override
+  Stream<Either<Failure, List<ChatMessage>>> getMesages({
+    required final String chatRoomId,
+  }) {
+    final messags = getChatRoomMessages(chatRoomId).snapshots();
+
+    final StreamSubscription streamSubscription = messags.listen(
+      (final event) {
+        messagesControler.add(
+          right(
+            event.docs.map((final e) => ChatMessage.fromFirestore(e)).toList(),
+          ),
+        );
+      },
+      onError: (final error) {
+        messagesControler.add(left(Failure(messgae: error.toString())));
+      },
+
+      cancelOnError: false,
+    );
+
+    messagesControler.onCancel = () {
+      messagesControler.close();
+      streamSubscription.cancel();
+    };
+
+    return messagesControler.stream;
   }
 }
