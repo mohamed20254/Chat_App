@@ -1,8 +1,10 @@
 import 'package:chat_app/data/model/chat_message_model.dart';
 import 'package:chat_app/data/model/contact_model.dart';
+import 'package:chat_app/logic/cubit/chat_cubit/cubit/chat_cubit.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class ChatScreen extends StatefulWidget {
   final ContactModel contact;
@@ -13,6 +15,20 @@ class ChatScreen extends StatefulWidget {
 }
 
 class _ChatScreenState extends State<ChatScreen> {
+  late TextEditingController controller = TextEditingController();
+  @override
+  void initState() {
+    super.initState();
+
+    context.read<ChatCubit>().enterChat(otherID: widget.contact.id ?? "");
+  }
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(final BuildContext context) {
     return Scaffold(
@@ -40,7 +56,7 @@ class _ChatScreenState extends State<ChatScreen> {
               },
             ),
           ),
-          Container(
+          DecoratedBox(
             decoration: BoxDecoration(color: Theme.of(context).cardColor),
             child: Row(
               children: [
@@ -52,6 +68,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 ),
                 Expanded(
                   child: TextField(
+                    controller: controller,
                     keyboardType: TextInputType.multiline,
                     decoration: InputDecoration(
                       filled: true,
@@ -64,7 +81,18 @@ class _ChatScreenState extends State<ChatScreen> {
                   ),
                 ),
 
-                IconButton(onPressed: () {}, icon: const Icon(Icons.send)),
+                IconButton(
+                  onPressed: () {
+                    //send message
+                    final message = controller.text.trim();
+                    controller.clear();
+                    context.read<ChatCubit>().sendMessage(
+                      content: message,
+                      reciverId: widget.contact.id ?? "",
+                    );
+                  },
+                  icon: const Icon(Icons.send),
+                ),
               ],
             ),
           ),

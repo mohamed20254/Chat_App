@@ -1,6 +1,6 @@
 import 'package:chat_app/config/injection/injection.dart';
 import 'package:chat_app/data/model/contact_model.dart';
-import 'package:chat_app/logic/cubit/auth_cubit.dart';
+import 'package:chat_app/logic/cubit/auth_cubit/auth_cubit.dart';
 import 'package:chat_app/presentation/auth/screen/login_screen.dart';
 import 'package:chat_app/presentation/auth/screen/signup_screen.dart';
 import 'package:chat_app/presentation/chat/chat_screen.dart';

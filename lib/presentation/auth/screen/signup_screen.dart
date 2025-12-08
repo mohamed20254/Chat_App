@@ -1,7 +1,7 @@
 import 'package:chat_app/core/common/custom_button.dart';
 import 'package:chat_app/core/common/custom_text_filed.dart';
 import 'package:chat_app/core/helper/app_validation.dart';
-import 'package:chat_app/logic/cubit/auth_cubit.dart';
+import 'package:chat_app/logic/cubit/auth_cubit/auth_cubit.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
