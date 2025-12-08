@@ -1,7 +1,9 @@
 import 'package:chat_app/config/injection/injection.dart';
+import 'package:chat_app/data/model/contact_model.dart';
 import 'package:chat_app/logic/cubit/auth_cubit.dart';
 import 'package:chat_app/presentation/auth/screen/login_screen.dart';
 import 'package:chat_app/presentation/auth/screen/signup_screen.dart';
+import 'package:chat_app/presentation/chat/chat_screen.dart';
 import 'package:chat_app/presentation/home/screen/home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -12,6 +14,7 @@ class AppRouting {
   static const String login = "/login";
   static const String signup = "/signup";
   static const String home = "/home";
+  static const String chat = "/chatscreen";
 
   static Route<dynamic>? onGenerateRoute(final RouteSettings setting) {
     switch (setting.name) {
@@ -40,6 +43,13 @@ class AppRouting {
         return MaterialPageRoute(
           builder: (final context) => const HomeScreen(),
         );
+      case chat:
+        {
+          final arg = setting.arguments as ContactModel;
+          return MaterialPageRoute(
+            builder: (final context) => ChatScreen(contact: arg),
+          );
+        }
       default:
         return MaterialPageRoute(
           builder: (final context) => const DefaultScren(),

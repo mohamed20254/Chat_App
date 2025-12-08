@@ -1,4 +1,5 @@
 import 'package:chat_app/config/injection/injection.dart';
+import 'package:chat_app/config/routing/app_routing.dart';
 import 'package:chat_app/data/model/contact_model.dart';
 import 'package:chat_app/data/repo/contact_repo.dart';
 import 'package:flutter/material.dart';
@@ -48,9 +49,18 @@ Future<void> showBottomSheetContact(final BuildContext context) {
                                     final index,
                                   ) {
                                     final matchcontac = matchedData[index];
-                                    return _customListTile(
-                                      context,
-                                      matchcontac,
+                                    return InkWell(
+                                      onTap: () {
+                                        Navigator.pushNamed(
+                                          context,
+                                          AppRouting.chat,
+                                          arguments: matchcontac,
+                                        );
+                                      },
+                                      child: _customListTile(
+                                        context,
+                                        matchcontac,
+                                      ),
                                     );
                                   }),
                                 )
