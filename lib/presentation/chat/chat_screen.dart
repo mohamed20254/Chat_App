@@ -21,8 +21,9 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   void initState() {
     super.initState();
-
-    context.read<ChatCubit>().enterChat(otherID: widget.contact.id ?? "");
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      context.read<ChatCubit>().enterChat(otherID: widget.contact.id ?? "");
+    });
   }
 
   @override

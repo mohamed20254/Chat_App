@@ -16,13 +16,15 @@ class ChatCubit extends Cubit<ChatState> {
   ChatCubit({required this.chatrepo, required this.currentID})
     : super(ChatInitial());
   StreamSubscription<Either<Failure, List<ChatMessage>>>? _sub;
+  bool _isopenChat = false;
   Future<void> enterChat({required final String otherID}) async {
-    emit(ChatLoading());
+    isClosed ? null : emit(ChatLoading());
     try {
       final chatRoom = await chatrepo.getOrcreateChatRoom(
         currentID: currentID,
         otherID: otherID,
       );
+      _isopenChat = true;
       _streamSubscription(chatRoom: chatRoom);
     } on Exception catch (e) {
       emit(ChatFailure(e.toString()));
@@ -50,6 +52,7 @@ class ChatCubit extends Cubit<ChatState> {
     }
   }
 
+  //===============================get messages
   Future<void> _streamSubscription({
     required final ChatRoomModel chatRoom,
   }) async {
@@ -57,15 +60,38 @@ class ChatCubit extends Cubit<ChatState> {
     _sub = chatrepo.getMesages(chatRoomId: chatRoom.id).listen((
       final messages,
     ) {
+      if (_isopenChat) {
+        markmessagesasread(chatroomId: chatRoom.id);
+      }
+
       messages.fold(
-        (final failure) => emit(ChatFailure(failure.messgae)),
-        (final messages) => emit(Chatfinish(chatRoom, messages: messages)),
+        (final failure) {
+          if (!isClosed) {
+            emit(ChatFailure(failure.messgae));
+          }
+        },
+        (final messages) {
+          if (!isClosed) {
+            emit(Chatfinish(chatRoom, messages: messages));
+          }
+        },
       );
     });
   }
 
+  Future<void> markmessagesasread({required final String chatroomId}) async {
+    await chatrepo.markMessageAdRead(chatroomId: chatroomId, userId: currentID);
+  }
+
+  @override
+  Future<void> close() {
+    _sub?.cancel();
+    return super.close();
+  }
+
   void dispose() {
     _sub?.cancel();
+    _isopenChat = false;
     log("==================================================================");
   }
 }

@@ -212,12 +212,21 @@ final class ChatRepoImpl implements ChatRepo {
     required final String chatroomId,
     required final String userId,
   }) async {
-    final unreademessages = await getChatRoomMessages(
-      chatroomId,
-    ).where("status", isEqualTo: MessageStatus.sent.toString()).get();
+    final messagesRef = getChatRoomMessages(chatroomId);
 
-    unreademessages.docs.map((e) {
-      getChatRoomMessages(chatroomId).doc(e.id).update({});
-    });
+    final unreadMessages = await messagesRef
+        .where("receiverId", isEqualTo: userId)
+        .where("status", isEqualTo: MessageStatus.sent.toString())
+        .get();
+
+    if (unreadMessages.docs.isEmpty) return;
+
+    final batch = sl<FirebaseFirestore>().batch();
+
+    for (final doc in unreadMessages.docs) {
+      batch.update(doc.reference, {"status": MessageStatus.read.toString()});
+    }
+
+    await batch.commit();
   }
 }
