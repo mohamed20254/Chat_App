@@ -1,6 +1,8 @@
 import 'package:chat_app/config/injection/injection.dart';
+import 'package:chat_app/data/model/chat_room_model.dart';
 import 'package:chat_app/data/model/contact_model.dart';
 import 'package:chat_app/logic/cubit/auth_cubit/auth_cubit.dart';
+import 'package:chat_app/logic/cubit/chats_rooms_cubit/chat_rooms_cubit.dart';
 import 'package:chat_app/presentation/auth/screen/login_screen.dart';
 import 'package:chat_app/presentation/auth/screen/signup_screen.dart';
 import 'package:chat_app/presentation/chat/chat_screen.dart';
@@ -26,7 +28,10 @@ class AppRouting {
                   create: (final context) => sl<AuthCubit>(),
                   child: const LoginScreen(),
                 )
-              : const HomeScreen(),
+              : BlocProvider(
+                  create: (final context) => sl<ChatRoomsCubit>(),
+                  child: const HomeScreen(),
+                ),
         );
       case login:
         return MaterialPageRoute(
@@ -44,7 +49,10 @@ class AppRouting {
         );
       case home:
         return MaterialPageRoute(
-          builder: (final context) => const HomeScreen(),
+          builder: (final context) => BlocProvider(
+            create: (context) => sl<ChatRoomsCubit>(),
+            child: const HomeScreen(),
+          ),
         );
       case chat:
         {

@@ -4,6 +4,7 @@ import 'package:chat_app/data/repo/contact_repo.dart';
 import 'package:chat_app/data/services/auth_remote.dart';
 import 'package:chat_app/logic/cubit/auth_cubit/auth_cubit.dart';
 import 'package:chat_app/logic/cubit/chat_cubit/cubit/chat_cubit.dart';
+import 'package:chat_app/logic/cubit/chats_rooms_cubit/chat_rooms_cubit.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get_it/get_it.dart';
@@ -41,6 +42,13 @@ Future<void> injectionApp() async {
     () => ChatCubit(
       chatrepo: sl<ChatRepo>(),
       currentID: sl<FirebaseAuth>().currentUser?.uid ?? "",
+    ),
+  );
+
+  sl.registerFactory<ChatRoomsCubit>(
+    () => ChatRoomsCubit(
+      sl<ChatRepo>(),
+      currentUser: sl<FirebaseAuth>().currentUser!.uid,
     ),
   );
 }
