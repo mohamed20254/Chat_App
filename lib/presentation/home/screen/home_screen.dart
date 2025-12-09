@@ -1,10 +1,11 @@
 import 'package:chat_app/config/injection/injection.dart';
 import 'package:chat_app/config/routing/app_routing.dart';
-import 'package:chat_app/data/model/chat_room_model.dart';
 import 'package:chat_app/data/model/contact_model.dart';
-import 'package:chat_app/data/repo/chat_repo.dart';
 import 'package:chat_app/logic/cubit/chats_rooms_cubit/chat_rooms_cubit.dart';
 import 'package:chat_app/presentation/home/widget/bottom_sheet_contact.dart';
+import 'package:chat_app/presentation/home/widget/custom_listtile.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -25,7 +26,17 @@ class _HomeScreenState extends State<HomeScreen> {
         actions: [
           Padding(
             padding: const EdgeInsets.all(10),
-            child: IconButton(onPressed: () {}, icon: const Icon(Icons.logout)),
+            child: IconButton(
+              onPressed: () async {
+                await sl<FirebaseAuth>().signOut();
+                Navigator.pushNamedAndRemoveUntil(
+                  context,
+                  AppRouting.login,
+                  (_) => false,
+                );
+              },
+              icon: const Icon(Icons.logout),
+            ),
           ),
         ],
       ),
@@ -47,7 +58,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       (final id) => id != sl<ChatRoomsCubit>().currentUser,
                     )
                     .toString();
-                ContactModel contact = ContactModel(
+                final contact = ContactModel(
                   id: otherid,
                   phoneNumper: "",
                   name: chat.participantsName![otherid].toString(),
@@ -76,40 +87,6 @@ class _HomeScreenState extends State<HomeScreen> {
         backgroundColor: Theme.of(context).primaryColor.withValues(alpha: 0.8),
         child: const Icon(Icons.add_comment_rounded, color: Colors.white),
       ),
-    );
-  }
-}
-
-class CustomListiTile extends StatelessWidget {
-  const CustomListiTile({super.key, required this.chat, this.ontap});
-
-  final ChatRoomModel chat;
-  final Function()? ontap;
-  @override
-  Widget build(final BuildContext context) {
-    String otherName = "";
-    chat.participantsName!.forEach((final key, final value) {
-      if (!key.contains(sl<ChatRoomsCubit>().currentUser)) {
-        otherName = value;
-      }
-    });
-    return ListTile(
-      onTap: ontap,
-      leading: CircleAvatar(
-        backgroundColor: Theme.of(context).primaryColor.withValues(alpha: 0.2),
-        child: Text(
-          otherName[0].toUpperCase(),
-          style: Theme.of(context).textTheme.bodyLarge,
-        ),
-      ),
-      subtitle: Text(chat.lastMessage ?? ""),
-      trailing: Column(
-        children: [
-          Text("12.3254 Am", style: Theme.of(context).textTheme.labelLarge),
-        ],
-      ),
-
-      title: Text(otherName),
     );
   }
 }

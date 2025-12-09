@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:bloc/bloc.dart';
 import 'package:chat_app/core/error/failure.dart';
@@ -17,6 +18,7 @@ class ChatRoomsCubit extends Cubit<ChatRoomsState> {
     getChats();
   }
   StreamSubscription<Either<Failure, List<ChatRoomModel>>>? _sub;
+
   void getChats() {
     emit(ChatRoomsLoding());
     _sub?.cancel();
@@ -24,13 +26,14 @@ class ChatRoomsCubit extends Cubit<ChatRoomsState> {
       event.fold((final failure) => emit(ChatRoomsFailure(failure.messgae)), (
         final chats,
       ) {
-        return emit(ChatRoomsfinish(chats));
+        emit(ChatRoomsfinish(chats: chats));
       });
     });
   }
 
   @override
   Future<void> close() {
+    log("cancel");
     _sub?.cancel();
     return super.close();
   }

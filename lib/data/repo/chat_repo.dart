@@ -34,9 +34,19 @@ abstract class ChatRepo {
     required final String chatRoomId,
     required final DocumentSnapshot lastdoc,
   });
-
+  //============================================================getAllChatsRooms
   Stream<Either<Failure, List<ChatRoomModel>>> getChatsRooms({
     required final String uid,
+  });
+  //===========================================getUn readmessage count
+  Stream<int> getUnreadMessages({
+    required final String roomId,
+    required final String userId,
+  });
+  //===============================================markmessage as read
+  Future<void> markMessageAdRead({
+    required final String chatroomId,
+    required final String userId,
   });
 }
 
@@ -169,17 +179,45 @@ final class ChatRepoImpl implements ChatRepo {
   }) {
     final chats = _collectionReference
         .where("participants", arrayContains: uid)
-        .orderBy("lastMessageTime", descending: true)
-        .snapshots();
-    return chats
+        .orderBy("lastMessageTime", descending: true);
+
+    return chats.snapshots().map((final event) {
+      try {
+        final chats = event.docs
+            .map((e) => ChatRoomModel.fromFirestore(e))
+            .toList();
+        return right<Failure, List<ChatRoomModel>>(chats);
+      } on Exception catch (e) {
+        return left(Failure(messgae: e.toString()));
+      }
+    });
+  }
+
+  @override
+  Stream<int> getUnreadMessages({
+    required final String roomId,
+    required final String userId,
+  }) {
+    return getChatRoomMessages(roomId)
+        .where("receiverId", isEqualTo: userId)
+        .where("status", isEqualTo: MessageStatus.sent.toString())
+        .snapshots()
         .map((final event) {
-          final chats = event.docs
-              .map((e) => ChatRoomModel.fromFirestore(e))
-              .toList();
-          return right<Failure, List<ChatRoomModel>>(chats);
-        })
-        .handleError((final error) {
-          return left(Failure(messgae: error.toString()));
+          return event.docs.length;
         });
+  }
+
+  @override
+  Future<void> markMessageAdRead({
+    required final String chatroomId,
+    required final String userId,
+  }) async {
+    final unreademessages = await getChatRoomMessages(
+      chatroomId,
+    ).where("status", isEqualTo: MessageStatus.sent.toString()).get();
+
+    unreademessages.docs.map((e) {
+      getChatRoomMessages(chatroomId).doc(e.id).update({});
+    });
   }
 }

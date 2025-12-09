@@ -4,7 +4,7 @@ sealed class ChatRoomsState extends Equatable {
   const ChatRoomsState();
 
   @override
-  List<Object> get props => [];
+  List<Object?> get props => [];
 }
 
 final class ChatRoomsInitial extends ChatRoomsState {}
@@ -14,9 +14,9 @@ final class ChatRoomsLoding extends ChatRoomsState {}
 final class ChatRoomsfinish extends ChatRoomsState {
   final List<ChatRoomModel> chats;
 
-  const ChatRoomsfinish(this.chats);
+  const ChatRoomsfinish({required this.chats});
   @override
-  List<Object> get props => [chats];
+  List<Object?> get props => [chats];
 }
 
 final class ChatRoomsFailure extends ChatRoomsState {
