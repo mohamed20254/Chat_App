@@ -13,10 +13,11 @@ final class ChatLoading extends ChatState {}
 
 final class Chatfinish extends ChatState {
   final ChatRoomModel chatRoom;
-  const Chatfinish(this.chatRoom);
+  final List<ChatMessage> messages;
+  const Chatfinish(this.chatRoom, {required this.messages});
 
   @override
-  List<Object> get props => [chatRoom];
+  List<Object> get props => [chatRoom, messages];
 }
 
 final class ChatFailure extends ChatState {

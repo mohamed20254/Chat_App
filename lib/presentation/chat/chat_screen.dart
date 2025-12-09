@@ -1,5 +1,7 @@
+import 'package:chat_app/config/injection/injection.dart';
 import 'package:chat_app/data/model/chat_message_model.dart';
 import 'package:chat_app/data/model/contact_model.dart';
+import 'package:chat_app/logic/cubit/auth_cubit/auth_cubit.dart';
 import 'package:chat_app/logic/cubit/chat_cubit/cubit/chat_cubit.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
@@ -26,6 +28,7 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   void dispose() {
     controller.dispose();
+    sl<ChatCubit>().dispose();
     super.dispose();
   }
 
@@ -37,24 +40,41 @@ class _ChatScreenState extends State<ChatScreen> {
       body: Column(
         children: [
           const SizedBox(height: 10),
-          Expanded(
-            child: ListView.builder(
-              itemCount: 30,
-              itemBuilder: (final context, final index) {
-                return MessageBubble(
-                  chatMessage: ChatMessage(
-                    id: "id",
-                    chatRoomId: "chatRoomId",
-                    senderId: "senderId",
-                    receiverId: "receiverId",
-                    content: "  hello my name is content",
-                    timestamp: Timestamp.now(),
-                    readBy: [],
+          BlocBuilder<ChatCubit, ChatState>(
+            builder: (final context, final state) {
+              if (state is ChatLoading) {
+                return const Center(child: CircularProgressIndicator());
+              } else if (state is ChatFailure) {
+                return Center(child: Text(state.message));
+              }
+              if (state is Chatfinish) {
+                return Expanded(
+                  child: ListView.builder(
+                    reverse: true,
+                    itemCount: state.messages.length,
+
+                    itemBuilder: (final context, final index) {
+                      final message = state.messages[index];
+                      final bool isMe =
+                          message.senderId == sl<ChatCubit>().currentID;
+                      return MessageBubble(
+                        chatMessage: ChatMessage(
+                          id: message.id,
+                          chatRoomId: message.chatRoomId,
+                          senderId: message.senderId,
+                          receiverId: message.receiverId,
+                          content: message.content,
+                          timestamp: message.timestamp,
+                          readBy: message.readBy,
+                        ),
+                        isMe: isMe,
+                      );
+                    },
                   ),
-                  isMe: false,
                 );
-              },
-            ),
+              }
+              return Container();
+            },
           ),
           DecoratedBox(
             decoration: BoxDecoration(color: Theme.of(context).cardColor),

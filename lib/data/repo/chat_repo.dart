@@ -3,6 +3,7 @@ import 'dart:developer';
 
 import 'package:chat_app/config/injection/injection.dart';
 import 'package:chat_app/core/error/failure.dart';
+import 'package:chat_app/core/error/firebase_exception.dart';
 import 'package:chat_app/data/model/chat_message_model.dart';
 import 'package:chat_app/data/model/chat_room_model.dart';
 import 'package:chat_app/data/services/auth_remote.dart';
@@ -14,7 +15,7 @@ abstract class ChatRepo {
     required final String currentID,
     required final String otherID,
   });
-
+  //===============================================sned message
   Future<void> sentmessage({
     required final String content,
     required final String chatRoomId,
@@ -23,16 +24,26 @@ abstract class ChatRepo {
     final MessageType type = MessageType.text,
   });
 
+  //=========================================================getMessagesStream
   Stream<Either<Failure, List<ChatMessage>>> getMesages({
     required final String chatRoomId,
+  });
+
+  //============================================================getmoremessages
+  Future<Either<Failure, List<ChatMessage>>> getMoreMesages({
+    required final String chatRoomId,
+    required final DocumentSnapshot lastdoc,
+  });
+
+  Stream<Either<Failure, List<ChatRoomModel>>> getChatsRooms({
+    required final String uid,
   });
 }
 
 final class ChatRepoImpl implements ChatRepo {
   CollectionReference get _collectionReference =>
       sl<FirebaseFirestore>().collection("chatRoom");
-  final messagesControler =
-      StreamController<Either<Failure, List<ChatMessage>>>();
+
   CollectionReference getChatRoomMessages(final String chatRoomId) {
     return _collectionReference.doc(chatRoomId).collection("messages");
   }
@@ -104,32 +115,71 @@ final class ChatRepoImpl implements ChatRepo {
     await batch.commit();
   }
 
+  //==================================================getmessages
   @override
   Stream<Either<Failure, List<ChatMessage>>> getMesages({
     required final String chatRoomId,
+    final DocumentSnapshot? lastdoc,
   }) {
-    final messags = getChatRoomMessages(chatRoomId).snapshots();
+    final messags = getChatRoomMessages(
+      chatRoomId,
+    ).orderBy("timestamp", descending: true).limit(20);
+    if (lastdoc != null) {
+      messags.startAfterDocument(lastdoc);
+    }
+    return messags
+        .snapshots()
+        .map((final snapshot) {
+          final messages = snapshot.docs
+              .map((e) => ChatMessage.fromFirestore(e))
+              .toList();
 
-    final StreamSubscription streamSubscription = messags.listen(
-      (final event) {
-        messagesControler.add(
-          right(
-            event.docs.map((final e) => ChatMessage.fromFirestore(e)).toList(),
-          ),
-        );
-      },
-      onError: (final error) {
-        messagesControler.add(left(Failure(messgae: error.toString())));
-      },
+          return right<Failure, List<ChatMessage>>(messages);
+        })
+        .handleError((final error) {
+          return left<Failure, List<ChatMessage>>(
+            Failure(messgae: error.toString()),
+          );
+        });
+  }
 
-      cancelOnError: false,
-    );
+  @override
+  Future<Either<Failure, List<ChatMessage>>> getMoreMesages({
+    required final String chatRoomId,
+    required final DocumentSnapshot lastdoc,
+  }) async {
+    try {
+      final messags = await getChatRoomMessages(chatRoomId)
+          .startAfterDocument(lastdoc)
+          .orderBy("timestamp", descending: true)
+          .limit(20)
+          .get();
 
-    messagesControler.onCancel = () {
-      messagesControler.close();
-      streamSubscription.cancel();
-    };
+      return right(
+        messags.docs.map((final e) => ChatMessage.fromFirestore(e)).toList(),
+      );
+    } on FirebaseException catch (e) {
+      return left(Failure(messgae: MyFirebaseServiceException(e.code).message));
+    }
+  }
 
-    return messagesControler.stream;
+  @override
+  Stream<Either<Failure, List<ChatRoomModel>>> getChatsRooms({
+    required final String uid,
+  }) {
+    final chats = _collectionReference
+        .where("participants", arrayContains: uid)
+        .orderBy("lastMessageTime", descending: true)
+        .snapshots();
+    return chats
+        .map((final event) {
+          final chats = event.docs
+              .map((e) => ChatRoomModel.fromFirestore(e))
+              .toList();
+          return right<Failure, List<ChatRoomModel>>(chats);
+        })
+        .handleError((final error) {
+          return left(Failure(messgae: error.toString()));
+        });
   }
 }
