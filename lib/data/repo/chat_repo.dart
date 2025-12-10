@@ -48,6 +48,18 @@ abstract class ChatRepo {
     required final String chatroomId,
     required final String userId,
   });
+
+  Stream<Map<String, dynamic>> getUserOnlineStatus(final String userId);
+
+  Future<void> updateOnlineStatus(final String userId, final bool isOnline);
+
+  Future<void> updateTypingStatus(
+    final String chatRoomId,
+    final String userId,
+    final bool isTyping,
+  );
+
+  Stream<Map<String, dynamic>> getTypingStatus(final String chatRoomId);
 }
 
 final class ChatRepoImpl implements ChatRepo {
@@ -230,6 +242,7 @@ final class ChatRepoImpl implements ChatRepo {
     await batch.commit();
   }
 
+  @override
   Stream<Map<String, dynamic>> getUserOnlineStatus(final String userId) {
     return sl<FirebaseFirestore>()
         .collection("users")
@@ -244,6 +257,7 @@ final class ChatRepoImpl implements ChatRepo {
         });
   }
 
+  @override
   Future<void> updateOnlineStatus(
     final String userId,
     final bool isOnline,
@@ -254,6 +268,7 @@ final class ChatRepoImpl implements ChatRepo {
     });
   }
 
+  @override
   Future<void> updateTypingStatus(
     final String chatRoomId,
     final String userId,
@@ -273,6 +288,7 @@ final class ChatRepoImpl implements ChatRepo {
     }
   }
 
+  @override
   Stream<Map<String, dynamic>> getTypingStatus(final String chatRoomId) {
     return _collectionReference.doc(chatRoomId).snapshots().map((
       final snapshot,

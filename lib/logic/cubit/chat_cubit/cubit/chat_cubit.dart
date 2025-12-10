@@ -3,9 +3,11 @@ import 'dart:developer';
 
 import 'package:bloc/bloc.dart';
 import 'package:chat_app/core/error/failure.dart';
+import 'package:chat_app/core/helper/time.dart';
 import 'package:chat_app/data/model/chat_message_model.dart';
 import 'package:chat_app/data/model/chat_room_model.dart';
 import 'package:chat_app/data/repo/chat_repo.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dartz/dartz.dart';
 import 'package:equatable/equatable.dart';
 part 'chat_state.dart';
@@ -17,6 +19,10 @@ class ChatCubit extends Cubit<ChatState> {
     : super(ChatInitial());
   StreamSubscription<Either<Failure, List<ChatMessage>>>? _sub;
   bool _isopenChat = false;
+
+  StreamSubscription? _subUserStatus;
+
+  //===================enter caht
   Future<void> enterChat({required final String otherID}) async {
     isClosed ? null : emit(ChatLoading());
     try {
@@ -25,6 +31,7 @@ class ChatCubit extends Cubit<ChatState> {
         otherID: otherID,
       );
       _isopenChat = true;
+      getUseronlineStatus(otherID);
       _streamSubscription(chatRoom: chatRoom);
     } on Exception catch (e) {
       emit(ChatFailure(e.toString()));
@@ -40,7 +47,7 @@ class ChatCubit extends Cubit<ChatState> {
       if (state is Chatfinish) {
         await chatrepo.sentmessage(
           content: content,
-          chatRoomId: (state as Chatfinish).chatRoom.id,
+          chatRoomId: (state as Chatfinish).chatRoom!.id,
           senderId: currentID,
           receiverId: reciverId,
         );
@@ -72,13 +79,22 @@ class ChatCubit extends Cubit<ChatState> {
         },
         (final messages) {
           if (!isClosed) {
-            emit(Chatfinish(chatRoom, messages: messages));
+            emit(
+              Chatfinish(
+                chatRoom: chatRoom,
+                messages: messages,
+                userStatus: (state is Chatfinish)
+                    ? (state as Chatfinish).userStatus
+                    : null,
+              ),
+            );
           }
         },
       );
     });
   }
 
+  //===========================================markmessagesasread
   Future<void> markmessagesasread({required final String chatroomId}) async {
     await chatrepo.markMessageAdRead(chatroomId: chatroomId, userId: currentID);
   }
@@ -92,6 +108,28 @@ class ChatCubit extends Cubit<ChatState> {
   void dispose() {
     _sub?.cancel();
     _isopenChat = false;
+    _subUserStatus?.cancel();
     log("==================================================================");
+  }
+
+  void getUseronlineStatus(final String userid) {
+    _subUserStatus?.cancel();
+
+    _subUserStatus = chatrepo.getUserOnlineStatus(userid).listen((final event) {
+      final lastSean = event["lastSeen"] as Timestamp;
+      final isOnline = event["isOnline"];
+
+      emit(
+        Chatfinish(
+          chatRoom: (state is Chatfinish)
+              ? (state as Chatfinish).chatRoom
+              : null,
+          messages: (state is Chatfinish)
+              ? List.of((state as Chatfinish).messages ?? [])
+              : null,
+          userStatus: isOnline ? "isonline" : formatTime(lastSean.toDate()),
+        ),
+      );
+    });
   }
 }

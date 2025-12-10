@@ -1,4 +1,7 @@
+import 'dart:developer';
+
 import 'package:chat_app/config/injection/injection.dart';
+import 'package:chat_app/core/helper/time.dart';
 import 'package:chat_app/data/model/chat_message_model.dart';
 import 'package:chat_app/data/model/contact_model.dart';
 import 'package:chat_app/logic/cubit/chat_cubit/cubit/chat_cubit.dart';
@@ -50,10 +53,10 @@ class _ChatScreenState extends State<ChatScreen> {
                 return Expanded(
                   child: ListView.builder(
                     reverse: true,
-                    itemCount: state.messages.length,
+                    itemCount: state.messages?.length ?? 0,
 
                     itemBuilder: (final context, final index) {
-                      final message = state.messages[index];
+                      final message = state.messages![index];
                       final bool isMe =
                           message.senderId == sl<ChatCubit>().currentID;
                       return MessageBubble(
@@ -156,11 +159,19 @@ class _ChatScreenState extends State<ChatScreen> {
                 ),
               ),
               const SizedBox(height: 2),
-              Text(
-                "online",
-                style: Theme.of(
-                  context,
-                ).textTheme.labelLarge!.copyWith(color: Colors.green),
+
+              BlocBuilder<ChatCubit, ChatState>(
+                builder: (final context, final state) {
+                  if (state is Chatfinish) {
+                    return Text(
+                      state.userStatus ?? "kkkkkk",
+                      style: Theme.of(
+                        context,
+                      ).textTheme.labelLarge!.copyWith(color: Colors.green),
+                    );
+                  }
+                  return Container();
+                },
               ),
             ],
           ),
@@ -250,19 +261,5 @@ class MessageBubble extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  String formatTime(DateTime time) {
-    int hour = time.hour;
-    final int minute = time.minute;
-
-    final String ampm = hour >= 12 ? "PM" : "AM";
-
-    hour = hour % 12;
-    if (hour == 0) hour = 12;
-
-    final String minuteStr = minute.toString().padLeft(2, '0');
-
-    return "$hour:$minuteStr $ampm";
   }
 }
