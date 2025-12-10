@@ -24,9 +24,16 @@ Supports **user authentication**, **contacts access**, and **responsive UI**. De
 
 <table>
 <tr>
-  <td><img src="assets/images/629shots_so.png" alt="Home Screen" width="200"/></td>
-  <td><img src="assets/images/chat.png" alt="Chat Screen" width="200"/></td>
-  <td><img src="assets/images/profile.png" alt="Profile Screen" width="200"/></td>
+  <td><img src="assets\images\629shots_so.png" alt="Home Screen" width="210"/></td>
+  <td><img src="assets\images\279shots_so.png" alt="Chat Screen" width="210"/></td>
+  <td><img src="assets\images\228shots_so.png" alt="Profile Screen" width="210"/></td>
+</tr>
+</table> 
+<table>
+<tr>
+  <td><img src="assets\images\162shots_so.png" alt="Home Screen" width="220"/></td>
+  <td><img src="assets\images\463shots_so.png" alt="Chat Screen" width="220"/></td>
+
 </tr>
 </table>
 
