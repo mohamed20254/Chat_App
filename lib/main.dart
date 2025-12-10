@@ -2,13 +2,11 @@ import 'package:chat_app/config/routing/app_routing.dart';
 import 'package:chat_app/config/theme/app_theme.dart';
 import 'package:chat_app/data/repo/chat_repo.dart';
 import 'package:chat_app/firebase_options.dart';
-import 'package:chat_app/logic/cubit/chat_cubit/cubit/chat_cubit.dart';
 import 'package:chat_app/logic/observer/app_life_cycle.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:chat_app/config/injection/injection.dart' as di;
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -31,7 +29,6 @@ class _MyAppState extends State<MyApp> {
 
   @override
   void initState() {
-    print(di.sl<FirebaseAuth>().currentUser!.uid.toString());
     if (di.sl<FirebaseAuth>().currentUser != null) {
       _appLifeCycleObserver = AppLifeCycleObserver(
         repo: di.sl<ChatRepo>(),

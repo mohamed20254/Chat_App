@@ -121,7 +121,7 @@ class ChatCubit extends Cubit<ChatState> {
           messages: (state is Chatfinish)
               ? List.of((state as Chatfinish).messages ?? [])
               : null,
-          userStatus: isOnline ? "isonline" : formatTime(lastSean.toDate()),
+          userStatus: isOnline ? "online" : formatTime(lastSean.toDate()),
         ),
       );
     });
