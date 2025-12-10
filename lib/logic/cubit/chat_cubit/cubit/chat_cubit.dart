@@ -30,6 +30,7 @@ class ChatCubit extends Cubit<ChatState> {
         currentID: currentID,
         otherID: otherID,
       );
+
       _isopenChat = true;
       getUseronlineStatus(otherID);
       _streamSubscription(chatRoom: chatRoom);
@@ -105,13 +106,6 @@ class ChatCubit extends Cubit<ChatState> {
     return super.close();
   }
 
-  void dispose() {
-    _sub?.cancel();
-    _isopenChat = false;
-    _subUserStatus?.cancel();
-    log("==================================================================");
-  }
-
   void getUseronlineStatus(final String userid) {
     _subUserStatus?.cancel();
 
@@ -131,5 +125,11 @@ class ChatCubit extends Cubit<ChatState> {
         ),
       );
     });
+  }
+
+  void dispose() {
+    _sub?.cancel();
+    _isopenChat = false;
+    _subUserStatus?.cancel();
   }
 }

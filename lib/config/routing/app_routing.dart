@@ -1,7 +1,7 @@
 import 'package:chat_app/config/injection/injection.dart';
-import 'package:chat_app/data/model/chat_room_model.dart';
 import 'package:chat_app/data/model/contact_model.dart';
 import 'package:chat_app/logic/cubit/auth_cubit/auth_cubit.dart';
+import 'package:chat_app/logic/cubit/chat_cubit/cubit/chat_cubit.dart';
 import 'package:chat_app/logic/cubit/chats_rooms_cubit/chat_rooms_cubit.dart';
 import 'package:chat_app/presentation/auth/screen/login_screen.dart';
 import 'package:chat_app/presentation/auth/screen/signup_screen.dart';
@@ -50,7 +50,7 @@ class AppRouting {
       case home:
         return MaterialPageRoute(
           builder: (final context) => BlocProvider(
-            create: (context) => sl<ChatRoomsCubit>(),
+            create: (final context) => sl<ChatRoomsCubit>(),
             child: const HomeScreen(),
           ),
         );
@@ -58,7 +58,10 @@ class AppRouting {
         {
           final arg = setting.arguments as ContactModel;
           return MaterialPageRoute(
-            builder: (final context) => ChatScreen(contact: arg),
+            builder: (final context) => BlocProvider(
+              create: (context) => sl<ChatCubit>(),
+              child: ChatScreen(contact: arg),
+            ),
           );
         }
       default:

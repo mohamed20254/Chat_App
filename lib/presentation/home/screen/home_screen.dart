@@ -5,7 +5,6 @@ import 'package:chat_app/logic/cubit/chats_rooms_cubit/chat_rooms_cubit.dart';
 import 'package:chat_app/presentation/home/widget/bottom_sheet_contact.dart';
 import 'package:chat_app/presentation/home/widget/custom_listtile.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -56,6 +55,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 final String otherid = chat.participants
                     .firstWhere(
                       (final id) => id != sl<ChatRoomsCubit>().currentUser,
+                      orElse: () => "",
                     )
                     .toString();
                 final contact = ContactModel(

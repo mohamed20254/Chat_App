@@ -68,6 +68,7 @@ class _ChatScreenState extends State<ChatScreen> {
                           content: message.content,
                           timestamp: message.timestamp,
                           readBy: message.readBy,
+                          status: message.status,
                         ),
                         isMe: isMe,
                       );
@@ -202,6 +203,7 @@ class MessageBubble extends StatelessWidget {
 
   @override
   Widget build(final BuildContext context) {
+    log(chatMessage.status.toString());
     return Align(
       alignment: isMe ? .centerRight : .centerLeft,
 

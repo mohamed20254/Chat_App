@@ -22,7 +22,7 @@ class CustomListiTile extends StatelessWidget {
       leading: CircleAvatar(
         backgroundColor: Theme.of(context).primaryColor.withValues(alpha: 0.2),
         child: Text(
-          otherName[0].toUpperCase(),
+          otherName.isNotEmpty ? otherName[0].toUpperCase() : "",
           style: Theme.of(context).textTheme.bodyLarge,
         ),
       ),

@@ -38,7 +38,7 @@ Future<void> injectionApp() async {
   //cubit
   sl.registerFactory<AuthCubit>(() => AuthCubit(sl<AuthRepo>()));
 
-  sl.registerLazySingleton<ChatCubit>(
+  sl.registerFactory<ChatCubit>(
     () => ChatCubit(
       chatrepo: sl<ChatRepo>(),
       currentID: sl<FirebaseAuth>().currentUser?.uid ?? "",

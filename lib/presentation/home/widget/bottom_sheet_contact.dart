@@ -4,10 +4,10 @@ import 'package:chat_app/data/model/contact_model.dart';
 import 'package:chat_app/data/repo/contact_repo.dart';
 import 'package:flutter/material.dart';
 
-Future<void> showBottomSheetContact(final BuildContext context) {
+Future<void> showBottomSheetContact(final BuildContext contextt) {
   return showModalBottomSheet(
     isScrollControlled: true,
-    context: context,
+    context: contextt,
     builder: (final context) {
       return Container(
         width: double.infinity,
@@ -52,7 +52,7 @@ Future<void> showBottomSheetContact(final BuildContext context) {
                                     return InkWell(
                                       onTap: () {
                                         Navigator.pushNamed(
-                                          context,
+                                          contextt,
                                           AppRouting.chat,
                                           arguments: matchcontac,
                                         );
