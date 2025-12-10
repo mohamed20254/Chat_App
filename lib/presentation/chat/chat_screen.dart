@@ -1,9 +1,7 @@
 import 'package:chat_app/config/injection/injection.dart';
 import 'package:chat_app/data/model/chat_message_model.dart';
 import 'package:chat_app/data/model/contact_model.dart';
-import 'package:chat_app/logic/cubit/auth_cubit/auth_cubit.dart';
 import 'package:chat_app/logic/cubit/chat_cubit/cubit/chat_cubit.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -21,7 +19,7 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+    WidgetsBinding.instance.addPostFrameCallback((final timeStamp) {
       context.read<ChatCubit>().enterChat(otherID: widget.contact.id ?? "");
     });
   }
@@ -229,26 +227,42 @@ class MessageBubble extends StatelessWidget {
               mainAxisSize: .min,
               children: [
                 Text(
-                  "214 Am",
-                  style: Theme.of(context).textTheme.labelLarge!.copyWith(
+                  formatTime(chatMessage.timestamp.toDate()),
+                  style: Theme.of(context).textTheme.labelMedium!.copyWith(
                     color: isMe ? Colors.white : Colors.black,
                   ),
                   overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(width: 10),
-                isMe
-                    ? Icon(
-                        Icons.done_all_sharp,
-                        color: chatMessage.status == MessageStatus.sent
-                            ? Colors.white
-                            : Colors.blueAccent,
-                      )
-                    : const SizedBox(),
+
+                if (isMe) ...[
+                  const SizedBox(width: 5),
+                  Icon(
+                    size: 15,
+                    Icons.done_all_sharp,
+                    color: chatMessage.status == MessageStatus.sent
+                        ? Colors.white
+                        : Colors.blueAccent,
+                  ),
+                ],
               ],
             ),
           ],
         ),
       ),
     );
+  }
+
+  String formatTime(DateTime time) {
+    int hour = time.hour;
+    final int minute = time.minute;
+
+    final String ampm = hour >= 12 ? "PM" : "AM";
+
+    hour = hour % 12;
+    if (hour == 0) hour = 12;
+
+    final String minuteStr = minute.toString().padLeft(2, '0');
+
+    return "$hour:$minuteStr $ampm";
   }
 }

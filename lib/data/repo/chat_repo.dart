@@ -141,7 +141,7 @@ final class ChatRepoImpl implements ChatRepo {
         .snapshots()
         .map((final snapshot) {
           final messages = snapshot.docs
-              .map((e) => ChatMessage.fromFirestore(e))
+              .map((final e) => ChatMessage.fromFirestore(e))
               .toList();
 
           return right<Failure, List<ChatMessage>>(messages);
@@ -184,7 +184,7 @@ final class ChatRepoImpl implements ChatRepo {
     return chats.snapshots().map((final event) {
       try {
         final chats = event.docs
-            .map((e) => ChatRoomModel.fromFirestore(e))
+            .map((final e) => ChatRoomModel.fromFirestore(e))
             .toList();
         return right<Failure, List<ChatRoomModel>>(chats);
       } on Exception catch (e) {
@@ -228,5 +228,63 @@ final class ChatRepoImpl implements ChatRepo {
     }
 
     await batch.commit();
+  }
+
+  Stream<Map<String, dynamic>> getUserOnlineStatus(final String userId) {
+    return sl<FirebaseFirestore>()
+        .collection("users")
+        .doc(userId)
+        .snapshots()
+        .map((final snapshot) {
+          final data = snapshot.data();
+          return {
+            'isOnline': data?['isOnline'] ?? false,
+            'lastSeen': data?['lastSeen'],
+          };
+        });
+  }
+
+  Future<void> updateOnlineStatus(
+    final String userId,
+    final bool isOnline,
+  ) async {
+    await sl<FirebaseFirestore>().collection("users").doc(userId).update({
+      'isOnline': isOnline,
+      'lastSeen': Timestamp.now(),
+    });
+  }
+
+  Future<void> updateTypingStatus(
+    final String chatRoomId,
+    final String userId,
+    final bool isTyping,
+  ) async {
+    try {
+      final doc = await _collectionReference.doc(chatRoomId).get();
+      if (!doc.exists) {
+        return;
+      }
+      await _collectionReference.doc(chatRoomId).update({
+        'isTyping': isTyping,
+        'typingUserId': isTyping ? userId : null,
+      });
+    } catch (e) {
+      log(e.toString());
+    }
+  }
+
+  Stream<Map<String, dynamic>> getTypingStatus(final String chatRoomId) {
+    return _collectionReference.doc(chatRoomId).snapshots().map((
+      final snapshot,
+    ) {
+      if (!snapshot.exists) {
+        return {'isTyping': false, 'typingUserId': null};
+      }
+      final data = snapshot.data() as Map<String, dynamic>;
+      return {
+        "isTyping": data['isTyping'] ?? false,
+        "typingUserId": data['typingUserId'],
+      };
+    });
   }
 }
