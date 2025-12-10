@@ -1,9 +1,11 @@
 import 'package:chat_app/core/common/custom_button.dart';
 import 'package:chat_app/core/common/custom_text_filed.dart';
 import 'package:chat_app/core/helper/app_validation.dart';
+import 'package:chat_app/logic/cubit/auth_cubit/auth_cubit.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -164,13 +166,38 @@ class _SignupScreenState extends State<SignupScreen> {
                     keyboardType: TextInputType.text,
                   ),
                   const SizedBox(height: 20),
-                  CustomButton(
-                    onPressed: () {
-                      //?============================================= ontap create account
-                      FocusScope.of(context).unfocus();
-                      if (_key.currentState?.validate() ?? false) {}
+                  BlocConsumer<AuthCubit, AuthState>(
+                    listener: (final context, final state) {
+                      if (state is AuthFailure) {
+                        ScaffoldMessenger.of(
+                          context,
+                        ).showSnackBar(SnackBar(content: Text(state.messgae)));
+                      }
                     },
-                    text: "Create Account",
+                    builder: (final context, final state) {
+                      return CustomButton(
+                        onPressed: () {
+                          //?============================================= ontap create account
+                          FocusScope.of(context).unfocus();
+                          if (_key.currentState?.validate() ?? false) {
+                            context.read<AuthCubit>().creatAcount(
+                              email: emailC.text,
+                              phone: phoneC.text,
+                              fullName: fullnameC.text,
+                              userName: usernameC.text,
+                              password: passwordC.text,
+                            );
+                          }
+                        },
+
+                        text: state is AuthLoading ? null : "Create Account",
+                        child: state is AuthLoading
+                            ? const CircularProgressIndicator(
+                                color: Colors.white,
+                              )
+                            : null,
+                      );
+                    },
                   ),
                   const SizedBox(height: 30),
                   Center(
