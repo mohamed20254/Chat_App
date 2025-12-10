@@ -1,5 +1,6 @@
 import 'package:chat_app/config/injection/injection.dart';
 import 'package:chat_app/config/routing/app_routing.dart';
+import 'package:chat_app/core/helper/cereat_colors.dart';
 import 'package:chat_app/data/model/contact_model.dart';
 import 'package:chat_app/data/repo/contact_repo.dart';
 import 'package:flutter/material.dart';
@@ -105,12 +106,12 @@ ListTile _customListTile(
 ) {
   return ListTile(
     leading: CircleAvatar(
-      backgroundColor: Theme.of(context).primaryColor.withValues(alpha: 0.4),
+      backgroundColor: randomColor().withValues(alpha: 0.4),
       child: Text(
         contact.name[0].toString().toUpperCase(),
         style: Theme.of(
           context,
-        ).textTheme.titleSmall!.copyWith(color: Theme.of(context).primaryColor),
+        ).textTheme.titleSmall!.copyWith(color: Colors.black),
       ),
     ),
     title: Text(

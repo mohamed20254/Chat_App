@@ -1,4 +1,6 @@
 import 'package:chat_app/config/injection/injection.dart';
+import 'package:chat_app/core/helper/cereat_colors.dart';
+import 'package:chat_app/core/helper/time.dart';
 import 'package:chat_app/data/model/chat_room_model.dart';
 import 'package:chat_app/data/repo/chat_repo.dart';
 import 'package:chat_app/logic/cubit/chats_rooms_cubit/chat_rooms_cubit.dart';
@@ -20,7 +22,7 @@ class CustomListiTile extends StatelessWidget {
     return ListTile(
       onTap: ontap,
       leading: CircleAvatar(
-        backgroundColor: Theme.of(context).primaryColor.withValues(alpha: 0.2),
+        backgroundColor: randomColor().withValues(alpha: 0.4),
         child: Text(
           otherName.isNotEmpty ? otherName[0].toUpperCase() : "",
           style: Theme.of(context).textTheme.bodyLarge,
@@ -34,7 +36,10 @@ class CustomListiTile extends StatelessWidget {
       trailing: Column(
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
-          Text("12.3254 Am", style: Theme.of(context).textTheme.labelLarge),
+          Text(
+            formatTime(chat.lastMessageTime?.toDate() ?? DateTime(1)),
+            style: Theme.of(context).textTheme.labelLarge,
+          ),
           StreamBuilder(
             stream: sl<ChatRepo>().getUnreadMessages(
               roomId: chat.id,
@@ -59,7 +64,7 @@ class CustomListiTile extends StatelessWidget {
                   child: Center(
                     child: Text(
                       count.toString(),
-                      style: const TextStyle(color: Colors.white, fontSize: 15),
+                      style: const TextStyle(color: Colors.white, fontSize: 12),
                     ),
                   ),
                 );
