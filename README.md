@@ -31,7 +31,7 @@ Supports **user authentication**, **contacts access**, and **responsive UI**. De
 </table> 
 <table>
 <tr>
-  <td><img src="assets\images\162shots_so.png" alt="Home Screen" width="220"/></td>
+  <td><img src="assets\images\537shots_so.png" alt="Home Screen" width="220"/></td>
   <td><img src="assets\images\463shots_so.png" alt="Chat Screen" width="220"/></td>
 
 </tr>
